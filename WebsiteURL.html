@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Redirect</title>
+    <script>
+        // 页面加载时执行的函数
+        window.onload = function() {
+            // 定义一个包含多个网址的数组
+            var urls = [
+                "https://www.example1.com",
+                "https://www.example2.com",
+                "https://www.example3.com",
+                "https://www.example4.com"
+            ];
+            // 生成一个0到urls数组长度之间的随机索引
+            var randomIndex = Math.floor(Math.random() * urls.length);
+            // 重定向到随机选择的网址
+            window.location.href = urls[randomIndex];
+        }
+    </script>
+</head>
+<body>
+    <p>如果没有自动跳转，请<a id="redirectLink" href="#">点击这里</a>。</p>
+    <script>
+        // 设置点击链接也能跳转
+        document.getElementById('redirectLink').onclick = function() {
+            var urls = [
+                "https://www.example1.com",
+                "https://www.example2.com",
+                "https://www.example3.com",
+                "https://www.example4.com"
+            ];
+            var randomIndex = Math.floor(Math.random() * urls.length);
+            window.location.href = urls[randomIndex];
+        }
+    </script>
+</body>
+</html>
