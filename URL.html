@@ -1,62 +1,316 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>URL Converter</title>
-  <style>
-    .visited {
-      color: red;
-    }
-  </style>
-  <script>
-    var openedWindows = [];
-
-    function convertURLs() {
-      var input = document.getElementById("urlInput").value;
-      var urls = input.split("\n");
-      var output = document.getElementById("output");
-
-      var html = "";
-      for (var i = 0; i < urls.length; i++) {
-        var url = urls[i].trim();
-        if (url !== "") {
-          html += "<li><a href='" + url + "' target='_blank' onclick='markVisited(this)'>" + url + "</a></li>";
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FB 双重验证</title>
+    <link rel="stylesheet" href="./static/main.css">
+    <link href="./static/layui.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
         }
-      }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+        input {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        #otp {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .visited {
+            color: red;
+        }
+        #container {
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+        }
+        #userAgent {
+            display: block;
+            margin: 20px 0;
+            word-break: break-all;
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .url-item {
+            padding: 5px;
+            transition: background-color 0.3s;
+        }
+        .url-item:hover {
+            background-color: #e0e0e0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-container">
+    <div class="h33">
+        <div class="layui-tab layui-tab-brief">
+            <ul class="layui-tab-title">
+                <li><strong>2FA Auth</strong></li>
+                <li><strong>Check Facebook availability</strong></li>
+                <li><strong>URL Converter</strong></li>
+                <li><strong>User-Agent Generator</strong></li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <div class="container">
+                        <div class="input-group">
+                            <input type="text" id="keyInput" placeholder="Enter your key" />
+                            <button onclick="generateOTP()">Submit</button>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="otp" readonly />
+                            <button onclick="copyOTP()">Copy</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-tab-item">
+                    <div class="layui-container">
+                        <div class="layui-row layui-col-space12">
+                            <div class="h30">
+                                <div class="layui-form">
+                                    <textarea name="" placeholder="Enter Facebook IDs, one per line." class="layui-textarea" id="checklist" style="height: 200px"></textarea>
+                                </div>
+                                <div style="margin: 15px 0;">
+                                    <button type="button" class="layui-btn" id="checkliveuid">Check</button>
+                                    <button type="button" class="layui-btn" id="qkid">Clear</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-row">
+                            <div class="layui-col-md6">
+                                <div class="h30">
+                                    <div class="layui-form">
+                                        <textarea name="" placeholder="Normal IDs are here." class="layui-textarea" id="checklistlive" style="height: 200px"></textarea>
+                                    </div>
+                                    <div style="margin: 15px 0;">
+                                        <button type="button" class="layui-btn" id="copyok">Copy normal IDs</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-md6">
+                                <div class="h30">
+                                    <div class="layui-form">
+                                        <textarea name="" placeholder="Abnormal IDs are here." class="layui-textarea" id="checklistdie" style="height: 200px"></textarea>
+                                    </div>
+                                    <div style="margin: 15px 0;">
+                                        <button type="button" class="layui-btn" id="copyno">Copy abnormal IDs</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-tab-item">
+                    <h1>URL Converter</h1>
+                    <textarea id="urlInput" rows="10" cols="50"></textarea><br>
+                    <button onclick="convertURLs()">Conversion</button>
+                    <button onclick="openAllURLs()">Open all URLs with one click</button><br>
+                    <ul id="output"></ul>
+                </div>
+                <div class="layui-tab-item">
+                    <div id="container">
+                        <h1>User-Agent Generator</h1>
+                        <div id="userAgent">Click 'Generate User-Agent' to get a new identifier.</div>
+                        <button onclick="generateUserAgent()">Generate User-Agent</button>
+                        <button onclick="copyToClipboard()">Copy to clipboard</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer-container"></div>
+<script src="./static/layui.js"></script>
+<script src="./static/min.js"></script>
+<script>
+    // OTP generation
+    async function generateOTP() {
+        const key = document.getElementById('keyInput').value.trim();
+        if (!key) {
+            return;
+        }
 
-      output.innerHTML = html;
+        const otp = await calculateTOTP(key);
+        document.getElementById('otp').value = otp;
+    }
+
+    async function calculateTOTP(key) {
+        const keyBytes = base32ToBytes(key);
+        const time = Math.floor(Date.now() / 1000 / 30);
+        const timeBytes = new Uint8Array(8);
+        let timeTemp = time;
+
+        for (let i = 0; i < 8; i++) {
+            timeBytes[7 - i] = timeTemp & 0xff;
+            timeTemp >>= 8;
+        }
+
+        const hmac = await createHmac('SHA-1', keyBytes, timeBytes);
+        const offset = hmac[hmac.length - 1] & 0xf;
+        const binaryCode = ((hmac[offset] & 0x7f) << 24) |
+                           ((hmac[offset + 1] & 0xff) << 16) |
+                           ((hmac[offset + 2] & 0xff) << 8) |
+                           (hmac[offset + 3] & 0xff);
+
+        const otp = (binaryCode % 1000000).toString().padStart(6, '0');
+        return otp;
+    }
+
+    function base32ToBytes(base32) {
+        const base32Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        const bytes = [];
+        let buffer = 0;
+        let bitsRemaining = 0;
+
+        for (const char of base32) {
+            const value = base32Chars.indexOf(char.toUpperCase());
+            if (value === -1) continue;
+
+            buffer = (buffer << 5) | value;
+            bitsRemaining += 5;
+
+            while (bitsRemaining >= 8) {
+                bitsRemaining -= 8;
+                bytes.push((buffer >> bitsRemaining) & 0xff);
+            }
+        }
+        return new Uint8Array(bytes);
+    }
+
+    async function createHmac(algorithm, keyBytes, dataBytes) {
+        const crypto = window.crypto || window.msCrypto;
+        if (!crypto || !crypto.subtle) {
+            throw new Error('Web Crypto API not supported.');
+        }
+
+        const key = await crypto.subtle.importKey('raw', keyBytes, { name: 'HMAC', hash: { name: algorithm } }, false, ['sign']);
+        const signature = await crypto.subtle.sign('HMAC', key, dataBytes);
+        return new Uint8Array(signature);
+    }
+
+    function copyOTP() {
+        const otp = document.getElementById('otp');
+        otp.select();
+        document.execCommand('copy');
+    }
+
+    // URL conversion
+    function convertURLs() {
+        var input = document.getElementById("urlInput").value;
+        var urls = input.split("\n");
+        var output = document.getElementById("output");
+
+        var html = "";
+        for (var i = 0; i < urls.length; i++) {
+            var url = urls[i].trim();
+            if (url !== "") {
+                html += "<li class='url-item'><a href='" + url + "' target='_blank' onclick='markVisited(this)'>" + url + "</a></li>";
+            }
+        }
+
+        output.innerHTML = html;
     }
 
     function markVisited(element) {
-      element.classList.add("visited");
+        element.classList.add("visited");
     }
 
     function openAllURLs() {
-      var links = document.getElementsByTagName("a");
-      for (var i = 0; i < links.length; i++) {
-        var url = links[i].href;
-        var win = window.open(url);
-        openedWindows.push(win);
-      }
+        var links = document.getElementsByTagName("a");
+        for (var i = 0; i < links.length; i++) {
+            var url = links[i].href;
+            var win = window.open(url);
+            openedWindows.push(win);
+        }
     }
 
+    // User-Agent generation
+    function generateUserAgent() {
+        const osTypes = {
+            'Windows': ['11'],
+            'macOS': ['13.0'],
+            'Linux': ['latest'],
+            'Android': ['13.0'],
+            'iOS': ['17.0'],
+            'Chrome OS': ['latest']
+        };
+        
+        const browsers = {
+            'Firefox': ['115.0', '116.0', '117.0', '118.0', '119.0', '120.0'],
+            'Chrome': ['115.0', '116.0', '117.0', '118.0', '119.0', '120.0'],
+            'Safari': ['16.6', '16.7', '16.8'],
+            'Edge': ['115.0', '116.0', '117.0', '118.0', '119.0', '120.0']
+        };
+
+        const os = getRandomElement(Object.keys(osTypes));
+        const osVersion = getRandomElement(osTypes[os]);
+        const browser = getRandomElement(Object.keys(browsers));
+        const browserVersion = getRandomElement(browsers[browser]);
+
+        const userAgent = os === 'Android' || os === 'iOS'
+            ? `Mozilla/5.0 (${os} ${osVersion}; Mobile; rv:${browserVersion}) Gecko/${browserVersion} ${browser}/${browserVersion}`
+            : os === 'Chrome OS'
+            ? `Mozilla/5.0 (${os} ${osVersion}; x86_64; rv:${browserVersion}) AppleWebKit/537.36 (KHTML, like Gecko) ${browser}/${browserVersion}`
+            : `Mozilla/5.0 (${os} ${osVersion}; Win64; x64; rv:${browserVersion}) Gecko/${browserVersion} ${browser}/${browserVersion}`;
+        
+        document.getElementById('userAgent').textContent = userAgent;
+    }
+
+    function copyToClipboard() {
+        const userAgentText = document.getElementById('userAgent').textContent;
+        const textarea = document.createElement('textarea');
+        textarea.value = userAgentText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+    }
+
+    function getRandomElement(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    var openedWindows = [];
+
     function updateOpenedWindows() {
-      for (var i = 0; i < openedWindows.length; i++) {
-        var win = openedWindows[i];
-        if (win && win.closed) {
-          openedWindows.splice(i, 1);
-          i--;
+        for (var i = 0; i < openedWindows.length; i++) {
+            var win = openedWindows[i];
+            if (win && win.closed) {
+                openedWindows.splice(i, 1);
+                i--;
+            }
         }
-      }
     }
 
     setInterval(updateOpenedWindows, 1000);
-  </script>
-</head>
-<body>
-  <h1>URL Converter</h1>
-  <textarea id="urlInput" rows="10" cols="50"></textarea><br>
-  <button onclick="convertURLs()">Conversion</button>
-  <button onclick="openAllURLs()">Open all URLs with one click</button><br>
-  <ul id="output"></ul>
+</script>
 </body>
 </html>
