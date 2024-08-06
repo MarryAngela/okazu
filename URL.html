@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>URLConverter</title>
+  <style>
+    .visited {
+      color: red;
+    }
+  </style>
+  <script>
+    var openedWindows = [];
+
+    function convertURLs() {
+      var input = document.getElementById("urlInput").value;
+      var urls = input.split("\n");
+      var output = document.getElementById("output");
+
+      var html = "";
+      for (var i = 0; i < urls.length; i++) {
+        var url = urls[i].trim();
+        if (url !== "") {
+          html += "<li><a href='" + url + "' target='_blank' onclick='markVisited(this)'>" + url + "</a></li>";
+        }
+      }
+
+      output.innerHTML = html;
+    }
+
+    function markVisited(element) {
+      element.classList.add("visited");
+    }
+
+    function openAllURLs() {
+      var links = document.getElementsByTagName("a");
+      for (var i = 0; i < links.length; i++) {
+        var url = links[i].href;
+        var win = window.open(url);
+        openedWindows.push(win);
+      }
+    }
+
+    function updateOpenedWindows() {
+      for (var i = 0; i < openedWindows.length; i++) {
+        var win = openedWindows[i];
+        if (win && win.closed) {
+          openedWindows.splice(i, 1);
+          i--;
+        }
+      }
+    }
+
+    setInterval(updateOpenedWindows, 1000);
+  </script>
+</head>
+<body>
+  <h1>URLConverter</h1>
+  <textarea id="urlInput" rows="10" cols="50"></textarea><br>
+  <button onclick="convertURLs()">Conversion</button>
+  <button onclick="openAllURLs()">Open all URLs with one click</button><br>
+  <ul id="output"></ul>
+</body>
+</html>
