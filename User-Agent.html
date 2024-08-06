@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User-Agent Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+        #container {
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+        }
+        #userAgent {
+            display: block;
+            margin: 20px 0;
+            word-break: break-all;
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>User-Agent Generator</h1>
+        <div id="userAgent">点击“生成 User-Agent”获取新的标识</div>
+        <button onclick="generateUserAgent()">生成 User-Agent</button>
+        <button onclick="copyToClipboard()">复制到剪贴板</button>
+    </div>
+
+    <script>
+        function generateUserAgent() {
+            const versions = ['115.0', '116.0', '117.0', '118.0', '119.0', '120.0'];
+            const randomVersion = versions[Math.floor(Math.random() * versions.length)];
+            const androidVersion = ['12', '13'][Math.floor(Math.random() * 2)];
+
+            const userAgent = `Mozilla/5.0 (Android ${androidVersion}; Mobile; rv:${randomVersion}) Gecko/${randomVersion} Firefox/${randomVersion}`;
+            document.getElementById('userAgent').textContent = userAgent;
+        }
+
+        function copyToClipboard() {
+            const userAgentText = document.getElementById('userAgent').textContent;
+            navigator.clipboard.writeText(userAgentText);
+        }
+    </script>
+</body>
+</html>
