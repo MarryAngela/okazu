@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Processor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #CCCCCC;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Link Processor</h2>
+    <textarea id="inputLinks" placeholder="Enter your links here..."></textarea>
+    <button onclick="processLinks()">Process Links</button>
+    <textarea id="outputLinks" readonly placeholder="Processed links will appear here..."></textarea>
+    <button id="copyButton" onclick="copyToClipboard()" disabled>Copy to Clipboard</button>
+
+    <script>
+        function processLinks() {
+            let inputText = document.getElementById('inputLinks').value;
+            let outputText = inputText.split('\n').map(link => {
+                return link.split('?')[0].trim();
+            }).filter(link => link !== '').join('\n');
+            document.getElementById('outputLinks').value = outputText;
+            document.getElementById('copyButton').disabled = !outputText;
+        }
+
+        function copyToClipboard() {
+            let outputLinks = document.getElementById('outputLinks');
+            outputLinks.select();
+            document.execCommand('copy');
+        }
+    </script>
+
+</body>
+</html>
