@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关键词生成器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        textarea {
+            width: 300px;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+        button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>关键词生成器</h1>
+    <label for="inputKeywords">输入关键词（每行一个）：</label><br>
+    <textarea id="inputKeywords"></textarea><br>
+
+    <label for="numKeywords">生成数量：</label>
+    <input type="number" id="numKeywords" value="15" min="1"><br>
+
+    <label for="numMustKeep">必须保留的关键词数量：</label>
+    <input type="number" id="numMustKeep" value="0" min="0"><br>
+    
+    <button onclick="generateKeywords()">生成</button><br>
+    
+    <label for="outputKeywords">输出关键词：</label><br>
+    <textarea id="outputKeywords" readonly></textarea>
+    <button onclick="copyToClipboard()">复制</button>
+
+    <script>
+        function generateKeywords() {
+            const inputText = document.getElementById('inputKeywords').value.trim();
+            const keywords = inputText.split('\n').map(keyword => keyword.trim()).filter(keyword => keyword);
+
+            const numKeywords = parseInt(document.getElementById('numKeywords').value);
+            const numMustKeep = parseInt(document.getElementById('numMustKeep').value);
+
+            if (isNaN(numKeywords) || numKeywords <= 0) {
+                alert('生成数量必须是一个正整数。');
+                return;
+            }
+
+            if (isNaN(numMustKeep) || numMustKeep < 0) {
+                alert('必须保留的数量必须是一个非负整数。');
+                return;
+            }
+
+            if (keywords.length < numKeywords) {
+                alert(`请输入至少 ${numKeywords} 个关键词。`);
+                return;
+            }
+
+            if (numMustKeep > keywords.length) {
+                alert(`必须保留的数量不能大于总关键词数量。`);
+                return;
+            }
+
+            // 保留的关键词
+            const mustKeepKeywords = keywords.slice(0, numMustKeep);
+            // 剩余的关键词
+            const remainingKeywords = keywords.slice(numMustKeep);
+            // 随机选择剩余的关键词
+            const shuffledRemainingKeywords = remainingKeywords.sort(() => 0.5 - Math.random());
+            const selectedKeywords = mustKeepKeywords.concat(shuffledRemainingKeywords.slice(0, numKeywords - numMustKeep));
+            
+            document.getElementById('outputKeywords').value = selectedKeywords.join('\n');
+        }
+
+        function copyToClipboard() {
+            const outputTextArea = document.getElementById('outputKeywords');
+            outputTextArea.select();
+            document.execCommand('copy');
+        }
+    </script>
+</body>
+</html>
