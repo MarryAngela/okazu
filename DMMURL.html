@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URLジェネレーター</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #555;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: none;
+            background-color: #f0f0f0;
+        }
+
+        button {
+            width: calc(50% - 10px);
+            padding: 10px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:first-child {
+            margin-right: 10px;
+        }
+
+        @media (max-width: 600px) {
+            button {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>URLジェネレーター</h1>
+
+        <label for="inputUrl">URLを入力してください:</label>
+        <input type="text" id="inputUrl" placeholder="ここにURLを入力" required>
+
+        <label for="inputId">IDを入力してください (デフォルト: ango-001):</label>
+        <input type="text" id="inputId" value="ango-001">
+
+        <label for="outputUrl">生成されたURL:</label>
+        <textarea id="outputUrl" rows="3" readonly></textarea>
+
+        <div>
+            <button onclick="copyToClipboard()">URLをコピー</button>
+            <button onclick="openInNewTab()">URLを開く</button>
+        </div>
+    </div>
+
+    <script>
+        function encodeURL() {
+            const inputUrl = document.getElementById('inputUrl').value;
+            const inputId = document.getElementById('inputId').value;
+            const encodedUrl = encodeURIComponent(inputUrl);
+            const fullUrl = `https://al.dmm.co.jp/?lurl=${encodedUrl}&af_id=${inputId}`;
+            document.getElementById('outputUrl').value = fullUrl;
+        }
+
+        document.getElementById('inputUrl').addEventListener('input', encodeURL);
+        document.getElementById('inputId').addEventListener('input', encodeURL);
+
+        function copyToClipboard() {
+            const outputUrl = document.getElementById('outputUrl');
+            outputUrl.select();
+            outputUrl.setSelectionRange(0, 99999); // For mobile devices
+            document.execCommand("copy");
+        }
+
+        function openInNewTab() {
+            const outputUrl = document.getElementById('outputUrl').value;
+            if (outputUrl) {
+                window.open(outputUrl, '_blank');
+            } else {
+                alert("有効なURLを入力してください！");
+            }
+        }
+    </script>
+
+</body>
+</html>
