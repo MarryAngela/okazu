@@ -70,6 +70,19 @@
             margin-right: 10px;
         }
 
+        #qrcode {
+            display: block;
+            margin: 20px auto;
+        }
+
+        .center-button {
+            text-align: center;
+        }
+
+        .center-button button {
+            width: auto;
+        }
+
         @media (max-width: 600px) {
             button {
                 width: 100%;
@@ -91,11 +104,19 @@
         <input type="text" id="inputId" value="ango-001">
 
         <label for="outputUrl">生成されたURL:</label>
-        <textarea id="outputUrl" rows="3" readonly></textarea>
+        <textarea id="outputUrl" rows="3"></textarea>
 
         <div>
             <button onclick="copyToClipboard()">URLをコピー</button>
             <button onclick="openInNewTab()">URLを開く</button>
+        </div>
+
+        <div>
+            <canvas id="qrcode" width="200" height="200"></canvas>
+        </div>
+
+        <div class="center-button">
+            <button onclick="downloadQrCode()">QRコードをダウンロード</button>
         </div>
     </div>
 
@@ -106,10 +127,14 @@
             const encodedUrl = encodeURIComponent(inputUrl);
             const fullUrl = `https://al.dmm.co.jp/?lurl=${encodedUrl}&af_id=${inputId}`;
             document.getElementById('outputUrl').value = fullUrl;
+            generateQrCode(fullUrl);
         }
 
         document.getElementById('inputUrl').addEventListener('input', encodeURL);
         document.getElementById('inputId').addEventListener('input', encodeURL);
+        document.getElementById('outputUrl').addEventListener('input', function() {
+            generateQrCode(this.value);
+        });
 
         function copyToClipboard() {
             const outputUrl = document.getElementById('outputUrl');
@@ -126,6 +151,54 @@
                 alert("有効なURLを入力してください！");
             }
         }
+
+        function generateQrCode(url) {
+            const canvas = document.getElementById('qrcode');
+            const ctx = canvas.getContext('2d');
+            const qrCodeSize = 200;
+
+            // Clear previous QR code
+            ctx.clearRect(0, 0, qrCodeSize, qrCodeSize);
+
+            // Generate QR code using QRious library
+            if (!url) return;
+            const qr = new QRious({
+                element: canvas,
+                value: url,
+                size: qrCodeSize
+            });
+        }
+
+        function downloadQrCode() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const imageSize = 650;
+            const qrCodeSize = 600;
+
+            // Set canvas size
+            canvas.width = imageSize;
+            canvas.height = imageSize;
+
+            // Fill background with white color
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, imageSize, imageSize);
+
+            // Draw the QR code in the center
+            const qrCanvas = document.getElementById('qrcode');
+            ctx.drawImage(qrCanvas, 25, 25, qrCodeSize, qrCodeSize);
+
+            // Download the image
+            const link = document.createElement('a');
+            const timestamp = new Date().getTime();
+            link.href = canvas.toDataURL('image/jpeg');
+            link.download = `${timestamp}.jpeg`;
+            link.click();
+        }
+
+        // Load QRious library for generating QR codes
+        const QRiousScript = document.createElement('script');
+        QRiousScript.src = 'https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js';
+        document.head.appendChild(QRiousScript);
     </script>
 
 </body>
