@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "https://x.com/X"
+      "destination": "https://x.com/X/status/1861842079183184332"
     }
   ]
 }
