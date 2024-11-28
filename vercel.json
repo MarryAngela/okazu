@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "https://x.com/elonmusk"
+      "destination": "https://x.com/X"
     }
   ]
 }
